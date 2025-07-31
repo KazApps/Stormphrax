@@ -123,7 +123,7 @@ namespace stormphrax {
             correction += contAdjustment(2, contCorrhist2Weight());
             correction += contAdjustment(4, contCorrhist4Weight());
 
-            score += correction / (2048 - depth * 4);
+            score += correction / (2048 - (16 - std::min(depth, 32)) * 4);
 
             return std::clamp(score, -kScoreWin + 1, kScoreWin - 1);
         }
