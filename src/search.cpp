@@ -570,6 +570,7 @@ namespace stormphrax::search {
                                  pos,
                                  thread.contMoves,
                                  ply,
+                                 depth,
                                  thread.nnueState,
                                  &thread.correctionHistory,
                                  m_contempt
@@ -704,7 +705,7 @@ namespace stormphrax::search {
             } else {
                 Score corrDelta{};
                 curr.staticEval =
-                    eval::adjustEval(pos, thread.contMoves, ply, &thread.correctionHistory, rawStaticEval, &corrDelta);
+                    eval::adjustEval(pos, thread.contMoves, ply, depth, &thread.correctionHistory, rawStaticEval, &corrDelta);
                 complexity = corrDelta;
             }
         }
@@ -1241,6 +1242,7 @@ namespace stormphrax::search {
                                  pos,
                                  thread.contMoves,
                                  ply,
+                                 0,
                                  thread.nnueState,
                                  &thread.correctionHistory,
                                  m_contempt
@@ -1277,7 +1279,7 @@ namespace stormphrax::search {
             }
 
             const auto staticEval =
-                eval::adjustEval(pos, thread.contMoves, ply, &thread.correctionHistory, rawStaticEval);
+                eval::adjustEval(pos, thread.contMoves, ply, 0, &thread.correctionHistory, rawStaticEval);
 
             if (ttEntry.flag == TtFlag::kExact                                       //
                 || ttEntry.flag == TtFlag::kUpperBound && ttEntry.score < staticEval //
