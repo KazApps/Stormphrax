@@ -31,7 +31,7 @@ namespace stormphrax::keys {
         constexpr usize kColor = 1;
         constexpr usize kCastling = 16;
         constexpr usize kEnPassant = 8;
-        constexpr usize kKingBucket = 8;
+        constexpr usize kKingBucket = 4;
 
         constexpr auto kTotal = kPieceSquares + kColor + kCastling + kEnPassant + kKingBucket;
     } // namespace sizes
@@ -112,6 +112,6 @@ namespace stormphrax::keys {
     }
 
     inline u64 kingBucket(Square square) {
-        return kKeys[offsets::kKingBucket + squareRank(square)];
+        return kKeys[offsets::kKingBucket + squareRank(square) / 2];
     }
 } // namespace stormphrax::keys
