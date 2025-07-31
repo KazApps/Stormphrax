@@ -24,6 +24,7 @@
 #include <cstring>
 
 #include "core.h"
+#include "keys.h"
 #include "position/position.h"
 #include "search_fwd.h"
 #include "tunable.h"
@@ -70,7 +71,11 @@ namespace stormphrax {
                                .update(bonus);
             };
 
-            m_pawnTable[stm][pos.pawnKey() % kEntries].update(bonus);
+            m_pawnTable[stm]
+                       [(pos.pawnKey() ^ keys::kingBucket(pos.king(Color::kWhite))
+                         ^ keys::kingBucket(pos.king(Color::kBlack)))
+                        % kEntries]
+                           .update(bonus * 3 / 2);
             m_blackNonPawnTable[stm][pos.blackNonPawnKey() % kEntries].update(bonus);
             m_whiteNonPawnTable[stm][pos.whiteNonPawnKey() % kEntries].update(bonus);
             m_majorTable[stm][pos.majorKey() % kEntries].update(bonus);
@@ -113,7 +118,11 @@ namespace stormphrax {
 
             i32 correction{};
 
-            correction += pawnCorrhistWeight() * m_pawnTable[stm][pos.pawnKey() % kEntries];
+            correction += pawnCorrhistWeight()
+                        * m_pawnTable[stm]
+                                     [(pos.pawnKey() ^ keys::kingBucket(pos.king(Color::kWhite))
+                                       ^ keys::kingBucket(pos.king(Color::kBlack)))
+                                      % kEntries];
             correction += blackNpWeight * m_blackNonPawnTable[stm][pos.blackNonPawnKey() % kEntries];
             correction += whiteNpWeight * m_whiteNonPawnTable[stm][pos.whiteNonPawnKey() % kEntries];
             correction += majorCorrhistWeight() * m_majorTable[stm][pos.majorKey() % kEntries];
