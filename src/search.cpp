@@ -1159,7 +1159,7 @@ namespace stormphrax::search {
                     pos.threats(),
                     pos.boards().pieceOn(bestMove.fromSq()),
                     bestMove,
-                    bonus
+                    bonus * 9 / 8
                 );
 
                 for (const auto prevQuiet : moveStack.failLowQuiets) {
@@ -1169,18 +1169,18 @@ namespace stormphrax::search {
                         pos.threats(),
                         pos.boards().pieceOn(prevQuiet.fromSq()),
                         prevQuiet,
-                        penalty
+                        penalty * 9 / 8
                     );
                 }
             } else {
                 const auto captured = pos.captureTarget(bestMove);
-                thread.history.updateNoisyScore(bestMove, captured, pos.threats(), bonus);
+                thread.history.updateNoisyScore(bestMove, captured, pos.threats(), bonus * 8 / 9);
             }
 
             // unconditionally update capthist
             for (const auto prevNoisy : moveStack.failLowNoisies) {
                 const auto captured = pos.captureTarget(prevNoisy);
-                thread.history.updateNoisyScore(prevNoisy, captured, pos.threats(), penalty);
+                thread.history.updateNoisyScore(prevNoisy, captured, pos.threats(), penalty * 8 / 9);
             }
         }
 
