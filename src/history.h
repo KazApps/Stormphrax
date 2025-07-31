@@ -50,7 +50,7 @@ namespace stormphrax {
         }
 
         inline void update(HistoryScore bonus) {
-            value += bonus - value * std::abs(bonus) / tunable::maxHistory();
+            value += bonus - (value * std::abs(bonus) + tunable::maxHistory() / 2) / tunable::maxHistory();
         }
     };
 
