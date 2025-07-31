@@ -1020,7 +1020,7 @@ namespace stormphrax::search {
                         const bool doDeeperSearch = score > bestScore + lmrDeeperBase() + lmrDeeperScale() * newDepth;
                         const bool doShallowerSearch = score < bestScore + newDepth;
 
-                        newDepth += doDeeperSearch - doShallowerSearch;
+                        newDepth += 2 * doDeeperSearch - doShallowerSearch;
 
                         score = -search(
                             thread,
