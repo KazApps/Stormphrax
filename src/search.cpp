@@ -1000,6 +1000,7 @@ namespace stormphrax::search {
                     r -= givesCheck * lmrCheckReductionScale();
                     r += cutnode * lmrCutnodeReductionScale();
                     r += (ttpv && ttHit && ttEntry.score <= alpha) * lmrTtpvFailLowReductionScale();
+                    r -= noisy * lmrNoisyReductionScale();
 
                     if (complexity) {
                         const bool highComplexity = *complexity > lmrHighComplexityThreshold();
