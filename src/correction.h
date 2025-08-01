@@ -123,7 +123,10 @@ namespace stormphrax {
             correction += contAdjustment(2, contCorrhist2Weight());
             correction += contAdjustment(4, contCorrhist4Weight());
 
-            score += correction / (2048 - (16 - std::min(depth, 32)) * 4);
+            constexpr i32 kLogTable[32 + 1] = {0, 0, 1, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4,
+                                               4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5};
+
+            score += correction / (2048 - kLogTable[std::min(depth, 32)] * 16);
 
             return std::clamp(score, -kScoreWin + 1, kScoreWin - 1);
         }
