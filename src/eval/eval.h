@@ -38,13 +38,13 @@ namespace stormphrax::eval {
         const Position& pos,
         std::span<search::PlayedMove> moves,
         i32 ply,
+        i32 depth,
         const CorrectionHistoryTable* correction,
         i32 eval,
         i32* corrDelta = nullptr
     ) {
-        eval = eval * (200 - pos.halfmove()) / 200;
-
         if constexpr (kCorrect) {
+            eval = eval * 1024 / (1024 + ply + depth);
             const auto corrected = correction->correct(pos, moves, ply, eval);
 
             if (corrDelta) {
@@ -52,6 +52,8 @@ namespace stormphrax::eval {
             }
 
             eval = corrected;
+        } else {
+            eval = eval * (200 - pos.halfmove()) / 200;
         }
 
         return std::clamp(eval, -kScoreWin + 1, kScoreWin - 1);
@@ -87,12 +89,13 @@ namespace stormphrax::eval {
         const Position& pos,
         std::span<search::PlayedMove> moves,
         i32 ply,
+        i32 depth,
         NnueState& nnueState,
         const CorrectionHistoryTable* correction,
         const Contempt& contempt = {}
     ) {
         const auto eval = staticEval(pos, nnueState, contempt);
-        return adjustEval<kCorrect>(pos, moves, ply, correction, eval);
+        return adjustEval<kCorrect>(pos, moves, ply, depth, correction, eval);
     }
 
     template <bool kScale = true>

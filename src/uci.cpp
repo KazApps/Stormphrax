@@ -743,7 +743,7 @@ namespace stormphrax {
 
             println();
 
-            const auto staticEval = eval::adjustEval<false>(m_pos, {}, 0, nullptr, eval::staticEvalOnce(m_pos));
+            const auto staticEval = eval::adjustEval<false>(m_pos, {}, 0, 0, nullptr, eval::staticEvalOnce(m_pos));
             const auto normalized = wdl::normalizeScore(staticEval, m_pos.classicalMaterial());
             const auto whitePerspective = m_pos.stm() == Color::kBlack ? -normalized : normalized;
 
@@ -755,7 +755,7 @@ namespace stormphrax {
         }
 
         void UciHandler::handleEval() {
-            const auto staticEval = eval::adjustEval<false>(m_pos, {}, 0, nullptr, eval::staticEvalOnce(m_pos));
+            const auto staticEval = eval::adjustEval<false>(m_pos, {}, 0, 0, nullptr, eval::staticEvalOnce(m_pos));
             const auto normalized = wdl::normalizeScore(staticEval, m_pos.classicalMaterial());
 
             println("Static eval: {:+}.{:02}", normalized / 100, std::abs(normalized) % 100);
