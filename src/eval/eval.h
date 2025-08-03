@@ -43,8 +43,9 @@ namespace stormphrax::eval {
         i32 eval,
         i32* corrDelta = nullptr
     ) {
+        eval = eval * 1024 / (1024 + ply + depth);
+
         if constexpr (kCorrect) {
-            eval = eval * 1024 / (1024 + ply + depth);
             const auto corrected = correction->correct(pos, moves, ply, eval);
 
             if (corrDelta) {
@@ -52,8 +53,6 @@ namespace stormphrax::eval {
             }
 
             eval = corrected;
-        } else {
-            eval = eval * (200 - pos.halfmove()) / 200;
         }
 
         return std::clamp(eval, -kScoreWin + 1, kScoreWin - 1);
