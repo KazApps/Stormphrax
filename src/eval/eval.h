@@ -43,7 +43,7 @@ namespace stormphrax::eval {
         i32 eval,
         i32* corrDelta = nullptr
     ) {
-        eval = eval * (1024 + ply) / (1024 + depth * 2);
+        eval = eval * (1280 + ply) / (1280 + depth * 2);
 
         if constexpr (kCorrect) {
             const auto corrected = correction->correct(pos, moves, ply, eval);
