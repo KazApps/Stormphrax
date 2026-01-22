@@ -153,7 +153,7 @@ namespace stormphrax {
 
         const auto entryValue = [this](const auto& entry) {
             const i32 relativeAge = (Entry::kAgeCycle + m_age - entry.age()) & Entry::kAgeMask;
-            return entry.depth - relativeAge * 2;
+            return (entry.depth - relativeAge * 2) * 1024 + entry.score;
         };
 
         auto& cluster = m_clusters[index(key)];
