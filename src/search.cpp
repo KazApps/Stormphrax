@@ -710,10 +710,10 @@ namespace stormphrax::search {
                 return false;
             }
             if (ply > 1 && thread.stack[ply - 2].staticEval != kScoreNone) {
-                return curr.staticEval > thread.stack[ply - 2].staticEval;
+                return curr.staticEval > thread.stack[ply - 2].staticEval + cutnode * 50;
             }
             if (ply > 3 && thread.stack[ply - 4].staticEval != kScoreNone) {
-                return curr.staticEval > thread.stack[ply - 4].staticEval;
+                return curr.staticEval > thread.stack[ply - 4].staticEval + cutnode * 100;
             }
             return true;
         }();

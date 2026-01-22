@@ -158,7 +158,6 @@ namespace stormphrax {
         }
 
         if (!move) {
-            newPos.m_pinned = newPos.calcPinned();
             newPos.m_threats = newPos.calcThreats();
 
             return newPos;
