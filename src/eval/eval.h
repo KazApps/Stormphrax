@@ -100,4 +100,9 @@ namespace stormphrax::eval {
         auto eval = NnueState::evaluateOnce(pos.bbs(), pos.kings(), pos.stm());
         return adjustStatic<kScale>(pos, contempt, eval);
     }
+
+    inline i32 complexity(const Position& pos, const Contempt& contempt = {}) {
+        auto eval = NnueState::evaluateOnce(pos.bbs(), pos.kings(), pos.stm());
+        return std::abs(adjustStatic<true>(pos, contempt, eval) - eval);
+    }
 } // namespace stormphrax::eval

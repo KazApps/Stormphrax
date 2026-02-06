@@ -49,7 +49,7 @@ namespace stormphrax::limit {
 
     class TimeManager final : public ISearchLimiter {
     public:
-        TimeManager(util::Instant start, f64 remaining, f64 increment, i32 toGo, f64 overhead);
+        TimeManager(util::Instant start, f64 remaining, f64 increment, i32 toGo, f64 overhead, i32 complexity);
         ~TimeManager() final = default;
 
         void update(const search::SearchData& data, Score score, Move bestMove, usize totalNodes) final;

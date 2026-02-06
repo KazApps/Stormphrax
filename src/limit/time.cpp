@@ -43,7 +43,7 @@ namespace stormphrax::limit {
         return m_stopped.load(std::memory_order_acquire);
     }
 
-    TimeManager::TimeManager(Instant start, f64 remaining, f64 increment, i32 toGo, f64 overhead) :
+    TimeManager::TimeManager(Instant start, f64 remaining, f64 increment, i32 toGo, f64 overhead, i32 complexity) :
             m_startTime{start} {
         assert(toGo >= 0);
 
@@ -53,7 +53,8 @@ namespace stormphrax::limit {
             toGo = defaultMovesToGo();
         }
 
-        const auto baseTime = limit / static_cast<f64>(toGo) + increment * incrementScale();
+        const auto baseTime =
+            limit / static_cast<f64>(toGo) + increment * incrementScale() * (0.95 + complexity / 100.0);
 
         m_maxTime = limit * hardTimeScale();
         m_softTime = std::min(baseTime * softTimeScale(), m_maxTime);

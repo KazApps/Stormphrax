@@ -539,7 +539,8 @@ namespace stormphrax {
                     static_cast<f64>(timeRemaining) / 1000.0,
                     static_cast<f64>(increment) / 1000.0,
                     toGo,
-                    static_cast<f64>(m_moveOverhead) / 1000.0
+                    static_cast<f64>(m_moveOverhead) / 1000.0,
+                    m_pos.isCheck() ? 0 : eval::complexity(m_pos)
                 );
             }
 
