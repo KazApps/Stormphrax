@@ -54,7 +54,7 @@ namespace stormphrax::limit {
         }
 
         const auto baseTime =
-            limit / static_cast<f64>(toGo) + increment * incrementScale() * (0.95 + complexity / 100.0);
+            limit / static_cast<f64>(toGo) + increment * incrementScale() * (0.95 + complexity / 200.0);
 
         m_maxTime = limit * hardTimeScale();
         m_softTime = std::min(baseTime * softTimeScale(), m_maxTime);
