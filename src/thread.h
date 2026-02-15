@@ -122,7 +122,6 @@ namespace stormphrax::search {
             stack.resize(kMaxDepth + 4);
             moveStack.resize(kMaxDepth * 2);
             conthist.resize(kMaxDepth + 4);
-            contMoves.resize(kMaxDepth + 4);
 
             keyHistory.reserve(1024);
         }
@@ -145,7 +144,6 @@ namespace stormphrax::search {
         std::vector<SearchStackEntry> stack{};
         std::vector<MoveStackEntry> moveStack{};
         std::vector<ContinuationSubtable*> conthist{};
-        std::vector<PlayedMove> contMoves{};
 
         HistoryTables history{};
         CorrectionHistoryTable correctionHistory{};
