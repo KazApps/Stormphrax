@@ -73,11 +73,9 @@ namespace stormphrax::eval::nnue::features::threats {
             return dst;
         }();
 
-        constexpr auto kOffsets = [] {
-            struct {
-                std::array<std::pair<i32, i32>, Pieces::kCount> indices{};
-                util::MultiArray<u32, Pieces::kCount, Squares::kCount> offsets{};
-            } dst{};
+        constexpr auto kOffsetsIndices = [] {
+            util::MultiArray<u32, Pieces::kCount, Squares::kCount> offsets{};
+            std::array<std::pair<i32, i32>, Pieces::kCount> indices{};
 
             i32 offset{};
 
@@ -88,20 +86,23 @@ namespace stormphrax::eval::nnue::features::threats {
                     i32 pieceOffset{};
                     for (u8 sqIdx = 0; sqIdx < Squares::kCount; ++sqIdx) {
                         const auto sq = Square::fromRaw(sqIdx);
-                        dst.offsets[piece.idx()][sq.idx()] = pieceOffset;
+                        offsets[piece.idx()][sq.idx()] = pieceOffset;
                         if (piece.type() != PieceTypes::kPawn || (sq.rank() > kRank1 && sq.rank() < kRank8)) {
                             const auto attacks = attacks::getPseudoAttacks(piece.flipColor(), sq);
                             pieceOffset += attacks.popcount();
                         }
                     }
 
-                    dst.indices[piece.idx()] = {pieceOffset, offset};
+                    indices[piece.idx()] = {pieceOffset, offset};
                     offset += kPieceTargetCount[piece.type().idx()] * pieceOffset;
                 }
             }
 
-            return dst;
+            return std::pair{offsets, indices};
         }();
+
+        constexpr auto kOffsets = kOffsetsIndices.first;
+        constexpr auto kIndices = kOffsetsIndices.second;
 
         constexpr auto kAttackIndices = [] {
             util::MultiArray<u32, Pieces::kCount, Pieces::kCount, 2> dst{};
@@ -118,7 +119,7 @@ namespace stormphrax::eval::nnue::features::threats {
                         attacker.type() == attacked.type() && (enemy || attacker.type() != PieceTypes::kPawn);
                     const bool excluded = map < 0;
 
-                    const auto [pieceOffset, offset] = kOffsets.indices[attacker.idx()];
+                    const auto [pieceOffset, offset] = kIndices[attacker.idx()];
 
                     const auto feature =
                         offset
@@ -151,7 +152,7 @@ namespace stormphrax::eval::nnue::features::threats {
         const bool forwards = attackerSq.idx() < attackedSq.raw();
 
         const auto attackIdx = kAttackIndices[attacker.idx()][attacked.idx()][forwards];
-        const auto offset = kOffsets.offsets[attacker.idx()][attackerSq.idx()];
+        const auto offset = kOffsets[attacker.idx()][attackerSq.idx()];
         const auto pieceIdx = kPieceIndices[attacker.idx()][attackerSq.idx()][attackedSq.idx()];
 
         return attackIdx + offset + pieceIdx;
