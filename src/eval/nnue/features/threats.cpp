@@ -57,54 +57,48 @@ namespace stormphrax::eval::nnue::features::threats {
             return dst;
         }
 
-        constexpr auto kPieceIndices = [] {
-            util::MultiArray<u8, Pieces::kCount, Squares::kCount, Squares::kCount> dst{};
+        constexpr auto kLut = [] {
+            util::MultiArray<u8, Pieces::kCount, Squares::kCount, Squares::kCount> pieceIndices{};
 
-            dst[Pieces::kBlackPawn.idx()] = generatePieceIndices(Pieces::kBlackPawn);
-            dst[Pieces::kWhitePawn.idx()] = generatePieceIndices(Pieces::kWhitePawn);
+            pieceIndices[Pieces::kBlackPawn.idx()] = generatePieceIndices(Pieces::kBlackPawn);
+            pieceIndices[Pieces::kWhitePawn.idx()] = generatePieceIndices(Pieces::kWhitePawn);
 
             for (u32 ptIdx = 1; ptIdx < PieceTypes::kCount; ++ptIdx) {
                 const auto pt = PieceType::fromRaw(ptIdx);
                 const auto indices = generatePieceIndices(pt.withColor(Colors::kBlack));
-                dst[pt.withColor(Colors::kBlack).idx()] = indices;
-                dst[pt.withColor(Colors::kWhite).idx()] = indices;
+                pieceIndices[pt.withColor(Colors::kBlack).idx()] = indices;
+                pieceIndices[pt.withColor(Colors::kWhite).idx()] = indices;
             }
 
-            return dst;
-        }();
-
-        constexpr auto kOffsets = [] {
             struct {
                 std::array<std::pair<i32, i32>, Pieces::kCount> indices{};
                 util::MultiArray<u32, Pieces::kCount, Squares::kCount> offsets{};
-            } dst{};
+            } offsets{};
 
-            i32 offset{};
+            {
+                i32 offset{};
 
-            for (const auto color : {Colors::kWhite, Colors::kBlack}) {
-                for (u8 ptIdx = 0; ptIdx < PieceTypes::kCount; ++ptIdx) {
-                    const auto piece = PieceType::fromRaw(ptIdx).withColor(color);
+                for (const auto color : {Colors::kWhite, Colors::kBlack}) {
+                    for (u8 ptIdx = 0; ptIdx < PieceTypes::kCount; ++ptIdx) {
+                        const auto piece = PieceType::fromRaw(ptIdx).withColor(color);
 
-                    i32 pieceOffset{};
-                    for (u8 sqIdx = 0; sqIdx < Squares::kCount; ++sqIdx) {
-                        const auto sq = Square::fromRaw(sqIdx);
-                        dst.offsets[piece.idx()][sq.idx()] = pieceOffset;
-                        if (piece.type() != PieceTypes::kPawn || (sq.rank() > kRank1 && sq.rank() < kRank8)) {
-                            const auto attacks = attacks::getPseudoAttacks(piece.flipColor(), sq);
-                            pieceOffset += attacks.popcount();
+                        i32 pieceOffset{};
+                        for (u8 sqIdx = 0; sqIdx < Squares::kCount; ++sqIdx) {
+                            const auto sq = Square::fromRaw(sqIdx);
+                            offsets.offsets[piece.idx()][sq.idx()] = pieceOffset;
+                            if (piece.type() != PieceTypes::kPawn || (sq.rank() > kRank1 && sq.rank() < kRank8)) {
+                                const auto attacks = attacks::getPseudoAttacks(piece.flipColor(), sq);
+                                pieceOffset += attacks.popcount();
+                            }
                         }
-                    }
 
-                    dst.indices[piece.idx()] = {pieceOffset, offset};
-                    offset += kPieceTargetCount[piece.type().idx()] * pieceOffset;
+                        offsets.indices[piece.idx()] = {pieceOffset, offset};
+                        offset += kPieceTargetCount[piece.type().idx()] * pieceOffset;
+                    }
                 }
             }
 
-            return dst;
-        }();
-
-        constexpr auto kAttackIndices = [] {
-            util::MultiArray<u32, Pieces::kCount, Pieces::kCount, 2> dst{};
+            util::MultiArray<u32, Pieces::kCount, Pieces::kCount, 2> attackIndices{};
 
             for (u8 attackerIdx = 0; attackerIdx < Pieces::kCount; ++attackerIdx) {
                 const auto attacker = Piece::fromRaw(attackerIdx);
@@ -118,15 +112,39 @@ namespace stormphrax::eval::nnue::features::threats {
                         attacker.type() == attacked.type() && (enemy || attacker.type() != PieceTypes::kPawn);
                     const bool excluded = map < 0;
 
-                    const auto [pieceOffset, offset] = kOffsets.indices[attacker.idx()];
+                    const auto [pieceOffset, offset] = offsets.indices[attacker.idx()];
 
                     const auto feature =
                         offset
                         + (attacked.color().flip().raw() * (kPieceTargetCount[attacker.type().idx()] / 2) + map)
                               * pieceOffset;
 
-                    dst[attacker.idx()][attacked.idx()][0] = excluded ? kTotalThreatFeatures : feature;
-                    dst[attacker.idx()][attacked.idx()][1] = excluded || semiExcluded ? kTotalThreatFeatures : feature;
+                    attackIndices[attacker.idx()][attacked.idx()][0] = excluded ? kTotalThreatFeatures : feature;
+                    attackIndices[attacker.idx()][attacked.idx()][1] =
+                        excluded || semiExcluded ? kTotalThreatFeatures : feature;
+                }
+            }
+
+            util::MultiArray<u32, Pieces::kCount, Squares::kCount, Pieces::kCount, Squares::kCount> dst{};
+
+            for (u8 attackerIdx = 0; attackerIdx < Pieces::kCount; ++attackerIdx) {
+                const auto attacker = Piece::fromRaw(attackerIdx);
+                for (u8 attackerSqIdx = 0; attackerSqIdx < Squares::kCount; ++attackerSqIdx) {
+                    const auto attackerSq = Square::fromRaw(attackerSqIdx);
+                    for (u8 attackedIdx = 0; attackedIdx < Pieces::kCount; ++attackedIdx) {
+                        const auto attacked = Piece::fromRaw(attackedIdx);
+                        for (u8 attackedSqIdx = 0; attackedSqIdx < Squares::kCount; ++attackedSqIdx) {
+                            const auto attackedSq = Square::fromRaw(attackedSqIdx);
+
+                            const bool forwards = attackerSq.idx() < attackedSq.raw();
+
+                            const auto attackIdx = attackIndices[attacker.idx()][attacked.idx()][forwards];
+                            const auto offset = offsets.offsets[attacker.idx()][attackerSq.idx()];
+                            const auto pieceIdx = pieceIndices[attacker.idx()][attackerSq.idx()][attackedSq.idx()];
+
+                            dst[attackerIdx][attackerSqIdx][attackedIdx][attackedSqIdx] = attackIdx + offset + pieceIdx;
+                        }
+                    }
                 }
             }
 
@@ -148,12 +166,6 @@ namespace stormphrax::eval::nnue::features::threats {
             attackedSq = attackedSq.flipFile();
         }
 
-        const bool forwards = attackerSq.idx() < attackedSq.raw();
-
-        const auto attackIdx = kAttackIndices[attacker.idx()][attacked.idx()][forwards];
-        const auto offset = kOffsets.offsets[attacker.idx()][attackerSq.idx()];
-        const auto pieceIdx = kPieceIndices[attacker.idx()][attackerSq.idx()][attackedSq.idx()];
-
-        return attackIdx + offset + pieceIdx;
+        return kLut[attacker.idx()][attackerSq.idx()][attacked.idx()][attackedSq.idx()];
     }
 } // namespace stormphrax::eval::nnue::features::threats

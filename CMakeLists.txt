@@ -30,18 +30,19 @@ endif()
 
 # disable -Wunused-function and -Wunused-const-variable for zstd
 if(MSVC)
-	add_compile_options(/EHsc /W4 /clang:-Wno-sign-compare /clang:-Wno-unused-function /clang:-Wno-unused-const-variable /WX /clang:-fconstexpr-steps=2097152)
+	add_compile_options(/EHsc /W4 /clang:-Wno-sign-compare /clang:-Wno-unused-function /clang:-Wno-unused-const-variable /WX /clang:-fconstexpr-steps=134217728)
 	# for pyrrhic
 	add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>")
 else()
-	add_compile_options(-Wall -Wextra -Wno-sign-compare -Wno-unused-function -Wno-unused-const-variable -Werror -fconstexpr-steps=2097152)
+	add_compile_options(-Wall -Wextra -Wno-sign-compare -Wno-unused-function -Wno-unused-const-variable -Werror -fconstexpr-steps=134217728)
 endif()
 
 find_package(Threads REQUIRED)
 
 # cmake forces thin lto on clang for CMAKE_INTERPROCEDURAL_OPTIMIZATION, thanks cmake
 add_compile_options($<$<CONFIG:Release>:-flto>)
+add_link_options($<$<CONFIG:Release>:-fuse-ld=lld>)
 
 option(SP_FAST_PEXT "whether pext and pdep are usably fast on this architecture, for building native binaries" ON)
 option(SP_DISABLE_AVX512 "whether to disable AVX-512 (zen 4)" OFF)
