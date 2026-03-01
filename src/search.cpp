@@ -730,6 +730,10 @@ namespace stormphrax::search {
             return true;
         }();
 
+        if (!curr.excluded && improving) {
+            curr.staticEval += 16;
+        }
+
         if (!kPvNode && !inCheck && !curr.excluded) {
             if (parent->reduction >= 3 && parent->staticEval != kScoreNone && curr.staticEval + parent->staticEval <= 0)
             {
