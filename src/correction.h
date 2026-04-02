@@ -86,16 +86,18 @@ namespace stormphrax {
                 pos.stm() == Colors::kBlack ? std::pair{stmNonPawnCorrhistWeight(), nstmNonPawnCorrhistWeight()}
                                             : std::pair{nstmNonPawnCorrhistWeight(), stmNonPawnCorrhistWeight()};
 
-            i32 correction{};
+            const i32 c1 = pawnCorrhistWeight() * tables.pawn[pos.pawnKey() % kEntries];
+            const i32 c2 = blackNpWeight * tables.blackNonPawn[pos.blackNonPawnKey() % kEntries];
+            const i32 c3 = whiteNpWeight * tables.whiteNonPawn[pos.whiteNonPawnKey() % kEntries];
+            const i32 c4 = majorCorrhistWeight() * tables.major[pos.majorKey() % kEntries];
+            const i32 c5 = contAdjustment(1, contCorrhist1Weight());
+            const i32 c6 = contAdjustment(2, contCorrhist2Weight());
+            const i32 c7 = contAdjustment(4, contCorrhist4Weight());
 
-            correction += pawnCorrhistWeight() * tables.pawn[pos.pawnKey() % kEntries];
-            correction += blackNpWeight * tables.blackNonPawn[pos.blackNonPawnKey() % kEntries];
-            correction += whiteNpWeight * tables.whiteNonPawn[pos.whiteNonPawnKey() % kEntries];
-            correction += majorCorrhistWeight() * tables.major[pos.majorKey() % kEntries];
+            const i32 avg = (c1 + c2 + c3 + c4 + c5 + c6 + c7) / 7;
 
-            correction += contAdjustment(1, contCorrhist1Weight());
-            correction += contAdjustment(2, contCorrhist2Weight());
-            correction += contAdjustment(4, contCorrhist4Weight());
+            const auto cv = [&](i32 c) { return std::abs(c - avg) < 16384 ? c : 0; };
+            const auto correction = cv(c1) + cv(c2) + cv(c3) + cv(c4) + cv(c5) + cv(c6) + cv(c7);
 
             score += correction / 2048;
 
