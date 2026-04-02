@@ -59,7 +59,7 @@ namespace stormphrax {
                 }
             };
 
-            tables.pawn[pos.pawnKey() % kEntries].update(bonus);
+            tables.pawn[(pos.pawnKey() ^ pos.threats()) % kEntries].update(bonus);
             tables.blackNonPawn[pos.blackNonPawnKey() % kEntries].update(bonus);
             tables.whiteNonPawn[pos.whiteNonPawnKey() % kEntries].update(bonus);
             tables.major[pos.majorKey() % kEntries].update(bonus);
@@ -88,7 +88,7 @@ namespace stormphrax {
 
             i32 correction{};
 
-            correction += pawnCorrhistWeight() * tables.pawn[pos.pawnKey() % kEntries];
+            correction += pawnCorrhistWeight() * tables.pawn[(pos.pawnKey() ^ pos.threats()) % kEntries];
             correction += blackNpWeight * tables.blackNonPawn[pos.blackNonPawnKey() % kEntries];
             correction += whiteNpWeight * tables.whiteNonPawn[pos.whiteNonPawnKey() % kEntries];
             correction += majorCorrhistWeight() * tables.major[pos.majorKey() % kEntries];
