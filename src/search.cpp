@@ -1015,10 +1015,8 @@ namespace stormphrax::search {
                     } else if (ttEntry.score >= beta) {
                         extension = -1;
                     }
-                } else if (
-                    depth <= 7 && !inCheck && curr.staticEval <= alpha - ldseMargin()
-                    && ttEntry.flag == TtFlag::kLowerBound
-                )
+                } else if (depth <= 7 && !inCheck && curr.staticEval <= alpha - ldseMargin()
+                           && ttEntry.flag == TtFlag::kLowerBound)
                 {
                     extension = 1;
                 }
@@ -1250,7 +1248,9 @@ namespace stormphrax::search {
         bestScore = std::clamp(bestScore, syzygyMin, syzygyMax);
 
         if (!curr.excluded) {
-            if (!inCheck && (bestMove.isNull() || !pos.isNoisy(bestMove) || !see::see(pos, bestMove, 0))
+            if (!inCheck
+                && (bestMove.isNull() || !pos.isNoisy(bestMove)
+                    || (complexity.has_value() && *complexity < 64 && !see::see(pos, bestMove, 0)))
                 && (ttFlag == TtFlag::kExact                                          //
                     || (ttFlag == TtFlag::kUpperBound && bestScore < curr.staticEval) //
                     || (ttFlag == TtFlag::kLowerBound && bestScore > curr.staticEval)))
