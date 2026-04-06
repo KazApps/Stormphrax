@@ -928,7 +928,7 @@ namespace stormphrax::search {
 
             const auto captured = pos.captureTarget(move);
 
-            const auto baseLmr = g_lmrTable[noisy][depth][legalMoves + 1];
+            auto& baseLmr = g_lmrTable[noisy][depth][legalMoves + 1];
 
             const auto history = noisy ? thread.history.noisyScore(move, captured, pos.threats())
                                        : thread.history.quietScore(thread.conthist, ply, pos.threats(), moving, move);
@@ -1055,6 +1055,12 @@ namespace stormphrax::search {
                     if (complexity) {
                         const bool highComplexity = *complexity > lmrHighComplexityThreshold();
                         r -= lmrHighComplexityReductionScale() * highComplexity;
+                    }
+
+                    if (r > baseLmr) {
+                        baseLmr += 1;
+                    } else if (r < baseLmr) {
+                        baseLmr -= 1;
                     }
 
                     // can't use std::clamp because newDepth can be <0
