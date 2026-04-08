@@ -157,6 +157,9 @@ namespace stormphrax::search {
 
         std::vector<u64> keyHistory{};
 
+        i32 quietLmrDivisor{tunable::quietLmrDivisor()};
+        i32 noisyLmrDivisor{tunable::noisyLmrDivisor()};
+
         [[nodiscard]] inline bool isMainThread() const {
             return id == 0;
         }

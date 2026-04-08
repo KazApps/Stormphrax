@@ -91,6 +91,8 @@ namespace stormphrax::search {
 
         for (auto& thread : m_threadData) {
             thread->history.clear();
+            thread->noisyLmrDivisor = noisyLmrDivisor();
+            thread->quietLmrDivisor = quietLmrDivisor();
         }
     }
 
@@ -464,9 +466,15 @@ namespace stormphrax::search {
 
                         beta = (alpha + beta) / 2;
                         alpha = std::max(score - delta, -kScoreInf);
+
+                        thread.quietLmrDivisor += 1;
+                        thread.noisyLmrDivisor += 1;
                     } else {
                         aspReduction = std::min(aspReduction + 1, 3);
                         beta = std::min(score + delta, kScoreInf);
+
+                        thread.quietLmrDivisor -= 1;
+                        thread.noisyLmrDivisor -= 1;
                     }
 
                     delta += delta * aspWideningFactor() / 16;
@@ -936,7 +944,7 @@ namespace stormphrax::search {
 
             const auto baseLmr = lmrReduction(
                 noisy ? noisyLmrBase() / 100.0 : quietLmrBase() / 100.0,
-                noisy ? noisyLmrDivisor() / 100.0 : quietLmrDivisor() / 100.0,
+                noisy ? thread.noisyLmrDivisor / 100.0 : thread.quietLmrDivisor / 100.0,
                 depth,
                 legalMoves + 1
             );
