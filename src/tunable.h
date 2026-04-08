@@ -40,9 +40,6 @@ namespace stormphrax::tunable {
     // [coloured piece], +1 for none
     extern std::array<i32, 13> g_seeValues;
 
-    void updateQuietLmrTable();
-    void updateNoisyLmrTable();
-
     void updateSeeValueTable();
 
 #define SP_TUNABLE_ASSERTS(Default, Min, Max, Step) \

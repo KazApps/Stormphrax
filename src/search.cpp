@@ -52,6 +52,12 @@ namespace stormphrax::search {
             return result;
         }();
 
+        inline i32 lmrReduction(f64 base, f64 divisor, i32 depth, i32 moves) {
+            const auto lnDepth = std::log(static_cast<f64>(depth));
+            const auto lnMoves = std::log(static_cast<f64>(moves));
+            return static_cast<i32>(128.0 * (base + lnDepth * lnMoves / divisor));
+        }
+
         [[nodiscard]] constexpr Score drawScore(usize nodes) {
             return 2 - static_cast<Score>(nodes % 4);
         }
@@ -928,7 +934,12 @@ namespace stormphrax::search {
 
             const auto captured = pos.captureTarget(move);
 
-            const auto baseLmr = g_lmrTable[noisy][depth][legalMoves + 1];
+            const auto baseLmr = lmrReduction(
+                noisy ? noisyLmrBase() / 100.0 : quietLmrBase() / 100.0,
+                noisy ? noisyLmrDivisor() / 100.0 : quietLmrDivisor() / 100.0,
+                depth,
+                legalMoves + 1
+            );
 
             const auto history = noisy ? thread.history.noisyScore(move, captured, pos.threats())
                                        : thread.history.quietScore(thread.conthist, ply, pos.threats(), moving, move);
@@ -1015,10 +1026,8 @@ namespace stormphrax::search {
                     } else if (ttEntry.score >= beta) {
                         extension = -1;
                     }
-                } else if (
-                    depth <= 7 && !inCheck && curr.staticEval <= alpha - ldseMargin()
-                    && ttEntry.flag == TtFlag::kLowerBound
-                )
+                } else if (depth <= 7 && !inCheck && curr.staticEval <= alpha - ldseMargin()
+                           && ttEntry.flag == TtFlag::kLowerBound)
                 {
                     extension = 1
                               + (!kPvNode && !ttMoveNoisy && ttEntry.depth >= depth - 3
