@@ -862,15 +862,9 @@ namespace stormphrax::search {
             if (!curr.ttpv && depth >= 7 && !isDecisive(beta) && (!ttMove || ttMoveNoisy)
                 && !(ttHit && ttEntry.depth >= probcutDepth && ttEntry.score < probcutBeta))
             {
-                const auto seeThreshold = (probcutBeta - curr.staticEval) * probcutSeeScale() / 16;
-
                 auto generator = MoveGenerator::probcut(pos, ttMove, moveStack.movegenData, thread.history);
 
                 while (const auto move = generator.next()) {
-                    if (!see::see(pos, move, seeThreshold)) {
-                        continue;
-                    }
-
                     thread.search.incNodes();
 
                     m_ttable.prefetch(pos.roughKeyAfter(move));
