@@ -1316,7 +1316,7 @@ namespace stormphrax::search {
 
         if (!curr.excluded) {
             if (!inCheck && (bestMove.isNull() || !pos.isNoisy(bestMove))
-                && (!complexity.has_value() || complexity < 128)
+                && (!complexity.has_value() || complexity > depth * 3)
                 && (ttFlag == TtFlag::kExact                                          //
                     || (ttFlag == TtFlag::kUpperBound && bestScore < curr.staticEval) //
                     || (ttFlag == TtFlag::kLowerBound && bestScore > curr.staticEval)))
