@@ -180,6 +180,7 @@ namespace stormphrax::tunable {
 
     SP_TUNABLE_PARAM(movepickButterflyWeight, 463, 0, 4096, 100)
     SP_TUNABLE_PARAM(movepickPieceToWeight, 499, 0, 4096, 100)
+    SP_TUNABLE_PARAM(movepickThreatWeight, 450, 0, 4096, 100)
     SP_TUNABLE_PARAM(movepickCont1Weight, 1107, 0, 4096, 100)
     SP_TUNABLE_PARAM(movepickCont2Weight, 1023, 0, 4096, 100)
     SP_TUNABLE_PARAM(movepickCont4Weight, 576, 0, 4096, 100)
@@ -216,6 +217,7 @@ namespace stormphrax::tunable {
 
     SP_TUNABLE_PARAM(searchButterflyWeight, 517, 0, 4096, 100)
     SP_TUNABLE_PARAM(searchPieceToWeight, 459, 0, 4096, 100)
+    SP_TUNABLE_PARAM(searchThreatWeight, 400, 0, 4096, 100)
     SP_TUNABLE_PARAM(searchCont1Weight, 1144, 0, 4096, 100)
     SP_TUNABLE_PARAM(searchCont2Weight, 1067, 0, 4096, 100)
     SP_TUNABLE_PARAM(searchCont4Weight, 593, 0, 4096, 100)
@@ -288,6 +290,7 @@ namespace stormphrax::tunable {
 
     SP_TUNABLE_PARAM(maxButterflyHistory, 16252, 8192, 32768, 256)
     SP_TUNABLE_PARAM(maxPieceToHistory, 16228, 8192, 32768, 256)
+    SP_TUNABLE_PARAM(maxThreatHistory, 16384, 8192, 32768, 256)
     SP_TUNABLE_PARAM(maxConthist, 16263, 8192, 32768, 256)
     SP_TUNABLE_PARAM(maxNoisyHistory, 16449, 8192, 32768, 256)
 
@@ -317,6 +320,7 @@ namespace stormphrax::tunable {
 
     SP_TUNABLE_PARAM(butterflyUpdateWeight, 940, 512, 2048, 76)
     SP_TUNABLE_PARAM(pieceToUpdateWeight, 861, 512, 2048, 76)
+    SP_TUNABLE_PARAM(threatUpdateWeight, 750, 512, 2048, 76)
 
     SP_TUNABLE_PARAM(cont1UpdateWeight, 1033, 512, 2048, 76)
     SP_TUNABLE_PARAM(cont2UpdateWeight, 1084, 512, 2048, 76)
@@ -324,6 +328,7 @@ namespace stormphrax::tunable {
 
     SP_TUNABLE_PARAM(contBaseButterflyWeight, 258, 0, 4096, 100)
     SP_TUNABLE_PARAM(contBasePieceToWeight, 176, 0, 4096, 100)
+    SP_TUNABLE_PARAM(contBaseThreatWeight, 128, 0, 4096, 100)
     SP_TUNABLE_PARAM(contBaseCont1Weight, 982, 0, 4096, 100)
     SP_TUNABLE_PARAM(contBaseCont2Weight, 1005, 0, 4096, 100)
     SP_TUNABLE_PARAM(contBaseCont4Weight, 485, 0, 4096, 100)

@@ -952,6 +952,7 @@ namespace stormphrax::search {
 
                     history += thread.history.getButterfly(pos.threats(), move) * searchButterflyWeight();
                     history += thread.history.getPieceTo(pos.threats(), moving, move) * searchPieceToWeight();
+                    history += thread.history.getThreat(pos.threats()) * searchThreatWeight();
 
                     history += getConthist(thread.conthist, ply, moving, move, 1) * searchCont1Weight();
                     history += getConthist(thread.conthist, ply, moving, move, 2) * searchCont2Weight();

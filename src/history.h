@@ -115,6 +115,7 @@ namespace stormphrax {
             using namespace tunable;
             butterflyEntry(threats, move).update(bonus * butterflyUpdateWeight() / 1024, maxButterflyHistory());
             pieceToEntry(threats, moving, move).update(bonus * pieceToUpdateWeight() / 1024, maxPieceToHistory());
+            threatEntry(threats).update(bonus * threatUpdateWeight() / 1024, maxThreatHistory());
         }
 
         inline void updateConthist(
@@ -131,6 +132,7 @@ namespace stormphrax {
 
             base += getButterfly(threats, move) * contBaseButterflyWeight();
             base += getPieceTo(threats, moving, move) * contBasePieceToWeight();
+            base += getThreat(threats) * contBaseThreatWeight();
 
             base += getConthist(continuations, ply, moving, move, 1) * contBaseCont1Weight();
             base += getConthist(continuations, ply, moving, move, 2) * contBaseCont2Weight();
@@ -171,7 +173,13 @@ namespace stormphrax {
             return noisyEntry(move, captured, threats[move.toSq()]);
         }
 
+        [[nodiscard]] inline i32 getThreat(Bitboard threats) const {
+            return threatEntry(threats);
+        }
+
     private:
+        static constexpr usize kEntries = 16384;
+
         // [from][to][from attacked][to attacked]
         util::MultiArray<HistoryEntry, Squares::kCount, Squares::kCount, 2, 2> m_butterfly{};
         // [piece][to]
@@ -182,6 +190,8 @@ namespace stormphrax {
         // [from][to][captured][defended]
         // additional slot for non-capture queen promos
         util::MultiArray<HistoryEntry, Squares::kCount, Squares::kCount, Pieces::kCount + 1, 2> m_noisy{};
+
+        std::array<HistoryEntry, kEntries> m_threat{};
 
         static inline void updateConthist(
             std::span<ContinuationSubtable*> continuations,
@@ -219,6 +229,14 @@ namespace stormphrax {
 
         [[nodiscard]] inline HistoryEntry& noisyEntry(Move move, Piece captured, bool defended) {
             return m_noisy[move.fromSqIdx()][move.toSqIdx()][captured.idx()][defended];
+        }
+
+        [[nodiscard]] inline const HistoryEntry& threatEntry(Bitboard threats) const {
+            return m_threat[threats % kEntries];
+        }
+
+        [[nodiscard]] inline HistoryEntry& threatEntry(Bitboard threats) {
+            return m_threat[threats % kEntries];
         }
     };
 } // namespace stormphrax
