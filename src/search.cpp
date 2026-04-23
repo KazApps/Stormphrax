@@ -1031,10 +1031,12 @@ namespace stormphrax::search {
                     curr.excluded = kNullMove;
 
                     if (score < sBeta) {
+                        const auto corrAdj = complexity.has_value() ? *complexity / 8 : 0;
+
                         const auto doubleMargin = doubleExtBaseMargin() + kPvNode * doubleExtPvMargin()
-                                                + ttMoveNoisy * doubleExtNoisyMargin();
+                                                + ttMoveNoisy * doubleExtNoisyMargin() - corrAdj;
                         const auto tripleMargin = tripleExtBaseMargin() + kPvNode * tripleExtPvMargin()
-                                                + ttMoveNoisy * tripleExtNoisyMargin();
+                                                + ttMoveNoisy * tripleExtNoisyMargin() - corrAdj;
                         extension = 1 + (score < sBeta - doubleMargin) + (score < sBeta - tripleMargin);
                     } else if (!kPvNode && score >= beta) {
                         return !isDecisive(score) ? util::ilerp<1024>(score, beta, multicutFailFirmT()) : score;
@@ -1043,10 +1045,8 @@ namespace stormphrax::search {
                     } else if (ttEntry.score >= beta) {
                         extension = -1;
                     }
-                } else if (
-                    depth <= 7 && !inCheck && curr.staticEval <= alpha - ldseMargin()
-                    && ttEntry.flag == TtFlag::kLowerBound
-                )
+                } else if (depth <= 7 && !inCheck && curr.staticEval <= alpha - ldseMargin()
+                           && ttEntry.flag == TtFlag::kLowerBound)
                 {
                     extension = 1
                               + (!kPvNode && !ttMoveNoisy && ttEntry.depth >= depth - 3
