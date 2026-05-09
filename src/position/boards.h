@@ -21,6 +21,7 @@
 #include "../types.h"
 
 #include <array>
+#include <span>
 
 #include "../bitboard.h"
 
