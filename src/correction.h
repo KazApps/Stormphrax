@@ -40,7 +40,8 @@ namespace stormphrax {
     class CorrectionHistoryTable {
     public:
         inline void clear() {
-            std::memset(&m_buckets, 0, sizeof(m_buckets));
+            std::memset(&m_tables, 0, sizeof(m_tables));
+            std::memset(&m_cont, 0, sizeof(m_cont));
         }
 
         inline void update(
@@ -50,14 +51,15 @@ namespace stormphrax {
             Score searchScore,
             Score staticEval
         ) {
-            auto& bucket = m_buckets[eval::nnue::output::MaterialCount<kBuckets>::getBucket(pos.bbs())];
-            auto& tables = bucket.m_tables[pos.stm().idx()];
+            auto& tables = m_tables[pos.stm().idx()];
 
             const auto bonus = std::clamp((searchScore - staticEval) * depth / 8, -kMaxBonus, kMaxBonus);
 
             const auto updateCont = [&](const u64 offset) {
                 if (keyHistory.size() >= offset) {
-                    bucket.m_cont[(pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries].update(bonus);
+                    m_cont[eval::nnue::output::MaterialCount<kBuckets>::getBucket(pos.bbs())]
+                          [(pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries]
+                              .update(bonus);
                 }
             };
 
@@ -74,12 +76,13 @@ namespace stormphrax {
         [[nodiscard]] inline Score correct(const Position& pos, std::span<const u64> keyHistory, Score score) const {
             using namespace tunable;
 
-            auto& bucket = m_buckets[eval::nnue::output::MaterialCount<kBuckets>::getBucket(pos.bbs())];
-            auto& tables = bucket.m_tables[pos.stm().idx()];
+            auto& tables = m_tables[pos.stm().idx()];
 
             const auto contAdjustment = [&](const u64 offset, i32 weight) {
                 if (keyHistory.size() >= offset) {
-                    return weight * bucket.m_cont[(pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries];
+                    return weight
+                         * m_cont[eval::nnue::output::MaterialCount<kBuckets>::getBucket(pos.bbs())]
+                                 [(pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries];
                 } else {
                     return 0;
                 }
@@ -131,11 +134,7 @@ namespace stormphrax {
             std::array<Entry, kEntries> major{};
         };
 
-        struct BucketedTables {
-            std::array<SidedTables, Colors::kCount> m_tables{};
-            std::array<Entry, kContEntries> m_cont{};
-        };
-
-        std::array<BucketedTables, kBuckets> m_buckets{};
+        std::array<SidedTables, Colors::kCount> m_tables{};
+        util::MultiArray<Entry, kBuckets, kContEntries> m_cont{};
     };
 } // namespace stormphrax
