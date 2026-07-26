@@ -177,7 +177,6 @@ namespace stormphrax::tunable {
 
     SP_TUNABLE_PARAM(contCorrhist1Weight, 152, 32, 384, 18)
     SP_TUNABLE_PARAM(contCorrhist2Weight, 214, 32, 384, 18)
-    SP_TUNABLE_PARAM(contCorrhist4Weight, 144, 32, 384, 18)
 
     SP_TUNABLE_PARAM(initialAspWindow, 7, 1, 50, 2)
     SP_TUNABLE_PARAM(aspSqScoreScale, 65, 0, 1024, 30)

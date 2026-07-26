@@ -53,7 +53,6 @@ namespace stormphrax {
 
         updateCont(1);
         updateCont(2);
-        updateCont(4);
     }
 
     i32 CorrectionHistoryTable::correction(const Position& pos, std::span<const u64> keyHistory) const {
@@ -78,7 +77,6 @@ namespace stormphrax {
 
         correction += contAdjustment(1, contCorrhist1Weight());
         correction += contAdjustment(2, contCorrhist2Weight());
-        correction += contAdjustment(4, contCorrhist4Weight());
 
         return correction;
     }
