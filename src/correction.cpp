@@ -40,9 +40,15 @@ namespace stormphrax {
 
         const auto bonus = std::clamp((searchScore - staticEval) * depth / 8, -kMaxBonus, kMaxBonus);
 
-        const auto updateCont = [&](const u64 offset) {
-            if (keyHistory.size() >= offset) {
-                m_cont[(pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries].update(bonus);
+        const auto updateCont = [&](u64 base, u64 target) {
+            assert(base < target);
+
+            const auto size = keyHistory.size();
+            const auto baseKey = base == 0 ? pos.key() : keyHistory[size - base];
+            const auto targetKey = keyHistory[size - target];
+
+            if (keyHistory.size() >= target) {
+                m_cont[(baseKey ^ targetKey) % kContEntries].update(bonus);
             }
         };
 
@@ -51,9 +57,10 @@ namespace stormphrax {
         tables.whiteNonPawn[pos.whiteNonPawnKey() % kEntries].update(bonus);
         tables.major[pos.majorKey() % kEntries].update(bonus);
 
-        updateCont(1);
-        updateCont(2);
-        updateCont(4);
+        updateCont(0, 1);
+        updateCont(0, 2);
+        updateCont(0, 4);
+        updateCont(1, 2);
     }
 
     i32 CorrectionHistoryTable::correction(const Position& pos, std::span<const u64> keyHistory) const {
@@ -61,9 +68,15 @@ namespace stormphrax {
 
         const auto& tables = m_tables[pos.stm().idx()];
 
-        const auto contAdjustment = [&](const u64 offset, i32 weight) {
-            if (keyHistory.size() >= offset) {
-                return weight * m_cont[(pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries];
+        const auto contAdjustment = [&](u64 base, u64 target, i32 weight) {
+            assert(base < target);
+
+            const auto size = keyHistory.size();
+            const auto baseKey = base == 0 ? pos.key() : keyHistory[size - base];
+            const auto targetKey = keyHistory[size - target];
+
+            if (keyHistory.size() >= target) {
+                return weight * m_cont[(baseKey ^ targetKey) % kContEntries];
             } else {
                 return 0;
             }
@@ -76,9 +89,10 @@ namespace stormphrax {
         correction += nonPawnCorrhistWeight() * tables.whiteNonPawn[pos.whiteNonPawnKey() % kEntries];
         correction += majorCorrhistWeight() * tables.major[pos.majorKey() % kEntries];
 
-        correction += contAdjustment(1, contCorrhist1Weight());
-        correction += contAdjustment(2, contCorrhist2Weight());
-        correction += contAdjustment(4, contCorrhist4Weight());
+        correction += contAdjustment(0, 1, contCorrhist1Weight());
+        correction += contAdjustment(0, 2, contCorrhist2Weight());
+        correction += contAdjustment(0, 4, contCorrhist4Weight());
+        correction += contAdjustment(1, 2, contCorrhist12Weight());
 
         return correction;
     }
