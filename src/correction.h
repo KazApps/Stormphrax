@@ -67,9 +67,9 @@ namespace stormphrax {
             std::array<Entry, kEntries> blackNonPawn{};
             std::array<Entry, kEntries> whiteNonPawn{};
             std::array<Entry, kEntries> major{};
+            std::array<Entry, kContEntries> cont{};
         };
 
         std::array<SidedTables, Colors::kCount> m_tables{};
-        std::array<Entry, kContEntries> m_cont{};
     };
 } // namespace stormphrax
