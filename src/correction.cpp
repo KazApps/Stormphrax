@@ -26,6 +26,7 @@
 namespace stormphrax {
     void CorrectionHistoryTable::clear() {
         std::memset(&m_tables, 0, sizeof(m_tables));
+        std::memset(&m_cont, 0, sizeof(m_cont));
     }
 
     void CorrectionHistoryTable::update(
@@ -47,7 +48,7 @@ namespace stormphrax {
             const auto targetKey = keyHistory[size - target];
 
             if (keyHistory.size() >= target) {
-                tables.cont[(baseKey ^ targetKey) % kContEntries].update(bonus);
+                m_cont[(baseKey ^ targetKey) % kContEntries].update(bonus);
             }
         };
 
@@ -75,7 +76,7 @@ namespace stormphrax {
             const auto targetKey = keyHistory[size - target];
 
             if (keyHistory.size() >= target) {
-                return weight * tables.cont[(baseKey ^ targetKey) % kContEntries];
+                return weight * m_cont[(baseKey ^ targetKey) % kContEntries];
             } else {
                 return 0;
             }
