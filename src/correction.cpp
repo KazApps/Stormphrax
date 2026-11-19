@@ -88,7 +88,7 @@ namespace stormphrax {
         u64 moveKey,
         std::span<const u64> keyHistory
     ) const {
-        __builtin_prefetch(&m_cont[moveKey % kEntries]);
+        __builtin_prefetch(&m_cont[moveKey % kContEntries]);
 
         for (const auto offset : {2 - 1, 4 - 1}) {
             if (keyHistory.size() >= offset) {
