@@ -1596,6 +1596,7 @@ namespace stormphrax::search {
             thread.search.incNodes();
 
             m_ttable.prefetch(pos.roughKeyAfter(move));
+            thread.correctionHistory->prefetchCont(pos, pos.roughMoveKey(move), thread.keyHistory);
 
             const auto [newPos, guard] = thread.applyMove(pos, ply, move);
 
