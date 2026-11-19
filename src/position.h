@@ -436,7 +436,11 @@ namespace stormphrax {
             return m_keys.majors;
         }
 
-        [[nodiscard]] u64 roughKeyAfter(Move move) const;
+        [[nodiscard]] u64 roughMoveKey(Move move) const;
+
+        [[nodiscard]] u64 roughKeyAfter(Move move) const {
+            return key() ^ roughMoveKey(move);
+        }
 
         [[nodiscard]] Bitboard allAttackersTo(Square sq, Bitboard occ) const;
         [[nodiscard]] Bitboard nonSliderAttackersTo(Square sq, Color attacker) const;

@@ -398,7 +398,7 @@ namespace stormphrax {
         return true;
     }
 
-    u64 Position::roughKeyAfter(Move move) const {
+    u64 Position::roughMoveKey(Move move) const {
         assert(move);
 
         const auto moving = pieceOn(move.fromSq());
@@ -406,7 +406,7 @@ namespace stormphrax {
 
         const auto captured = pieceOn(move.toSq());
 
-        auto key = m_keys.all;
+        u64 key = 0;
 
         key ^= keys::pieceSquare(moving, move.fromSq());
         key ^= keys::pieceSquare(moving, move.toSq());

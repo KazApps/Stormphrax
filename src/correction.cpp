@@ -82,4 +82,20 @@ namespace stormphrax {
 
         return correction;
     }
+
+    void CorrectionHistoryTable::prefetch_contcorr(
+        const Position& pos,
+        u64 moveKey,
+        std::span<const u64> keyHistory
+    ) const {
+        __builtin_prefetch(&m_cont[moveKey % kEntries]);
+
+        for (const auto offset : {2 - 1, 4 - 1}) {
+            if (keyHistory.size() >= offset) {
+                __builtin_prefetch(
+                    &m_cont[(moveKey ^ pos.key() ^ keyHistory[keyHistory.size() - offset]) % kContEntries]
+                );
+            }
+        }
+    }
 } // namespace stormphrax
