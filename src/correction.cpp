@@ -79,6 +79,7 @@ namespace stormphrax {
         correction += contAdjustment(1, contCorrhist1Weight());
         correction += contAdjustment(2, contCorrhist2Weight());
         correction += contAdjustment(4, contCorrhist4Weight());
+        correction += contAdjustment(6, contCorrhist6Weight());
 
         return correction;
     }
