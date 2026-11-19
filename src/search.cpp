@@ -935,7 +935,7 @@ namespace stormphrax::search {
                     thread.search.incNodes();
 
                     m_ttable.prefetch(pos.roughKeyAfter(move));
-                    thread.correctionHistory->prefetch_contcorr(pos, pos.roughMoveKey(move), thread.keyHistory);
+                    thread.correctionHistory->prefetchCont(pos, pos.roughMoveKey(move), thread.keyHistory);
 
                     const auto [newPos, guard] = thread.applyMove(pos, ply, move);
 
@@ -1132,7 +1132,7 @@ namespace stormphrax::search {
             cutnode |= extension < 0;
 
             m_ttable.prefetch(pos.roughKeyAfter(move));
-            thread.correctionHistory->prefetch_contcorr(pos, pos.roughMoveKey(move), thread.keyHistory);
+            thread.correctionHistory->prefetchCont(pos, pos.roughMoveKey(move), thread.keyHistory);
 
             const auto [newPos, guard] = thread.applyMove(pos, ply, move);
 

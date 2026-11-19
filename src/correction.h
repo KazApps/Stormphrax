@@ -41,7 +41,7 @@ namespace stormphrax {
 
         [[nodiscard]] i32 correction(const Position& pos, std::span<const u64> keyHistory) const;
 
-        void prefetch_contcorr(const Position& pos, u64 moveKey, std::span<const u64> keyHistory) const;
+        void prefetchCont(const Position& pos, u64 moveKey, std::span<const u64> keyHistory) const;
 
     private:
         static constexpr usize kEntries = 16384;

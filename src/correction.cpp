@@ -83,7 +83,7 @@ namespace stormphrax {
         return correction;
     }
 
-    void CorrectionHistoryTable::prefetch_contcorr(
+    void CorrectionHistoryTable::prefetchCont(
         const Position& pos,
         u64 moveKey,
         std::span<const u64> keyHistory
