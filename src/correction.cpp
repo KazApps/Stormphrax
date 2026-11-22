@@ -103,7 +103,7 @@ namespace stormphrax {
         correction += contAdjustment({0, 1}, contCorrhist1Weight());
         correction += contAdjustment({0, 2}, contCorrhist2Weight());
         correction += contAdjustment({0, 4}, contCorrhist4Weight());
-        correction += contAdjustment({0, 1, 3, 4}, contCorrhist0134Weight());
+        correction += contAdjustment({0, 1, 5, 6}, contCorrhist0156Weight());
 
         return correction;
     }
